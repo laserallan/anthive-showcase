@@ -1,0 +1,54 @@
+{
+  "cdn": "vendor/",
+  "fonts": [
+    {
+      "family": "Press Start 2P",
+      "path": "@fontsource/press-start-2p@5.3.0/files/press-start-2p-latin-400-normal.woff2",
+      "integrity": "sha384-7RazWJ1X/i01fO9rBfywX8wqF0ZhXEBxqWCiqL5ViaOsDxPX9qL05X3C+VKXZ+iD"
+    },
+    {
+      "family": "Source Serif 4",
+      "path": "@fontsource/source-serif-4@5.3.0/files/source-serif-4-latin-400-normal.woff2",
+      "integrity": "sha384-QH8kQ1dp35FXXdgaYtl6lRIMtjT62fMRls72L4GH5Apv6brOezk4QZWWj/Sam95h"
+    },
+    {
+      "family": "Source Serif 4",
+      "path": "@fontsource/source-serif-4@5.3.0/files/source-serif-4-latin-400-italic.woff2",
+      "style": "italic",
+      "integrity": "sha384-X8/PN0NCJkZ/dVLPI+6jbrX75jDwysBJ/iuWUmedAoIkaLktFGSbG6krNZq6JJbR"
+    },
+    {
+      "family": "Source Serif 4",
+      "path": "@fontsource/source-serif-4@5.3.0/files/source-serif-4-latin-600-normal.woff2",
+      "weight": "600",
+      "integrity": "sha384-L5iHvialTpQ6MhRxJDObkEDLET6CRM/vQVbheXGrcJToX7+VHK4ZkWkqpCtB60yj"
+    },
+    {
+      "family": "Inter",
+      "path": "@fontsource/inter@5.3.0/files/inter-latin-300-normal.woff2",
+      "weight": "300",
+      "integrity": "sha384-2s/PfYCRTVl80ER/88TbUzQNcgT8MQy4aCnI7FX1W748qNrCa4a/ZHJhAFUKby8X"
+    },
+    {
+      "family": "Inter",
+      "path": "@fontsource/inter@5.3.0/files/inter-latin-500-normal.woff2",
+      "weight": "500",
+      "integrity": "sha384-Gc+Y0nUDn4VNPctUxm7fGeC3IzQQsdpCE/TGf0SWGmMNnKzTF/W9wSUX2A3SjV3o"
+    }
+  ],
+  "licenses": [
+    {
+      "path": "@fontsource/press-start-2p@5.3.0/LICENSE",
+      "integrity": "sha384-Uw+/7sbUqVNX398+OfzNvFzlUFLXWx4i3iRqJKEnKdckFsimtaEryIHxa7jlRqKm"
+    },
+    {
+      "path": "@fontsource/source-serif-4@5.3.0/LICENSE",
+      "integrity": "sha384-SBZx/9BZ16w4UhHNp8yeyXPgeNVjp2LKgIb2rzyiLzPl3Q+h+9ongbnHA+Hsrdtq"
+    },
+    {
+      "path": "@fontsource/inter@5.3.0/LICENSE",
+      "integrity": "sha384-kj3ws+qnzjazxsLTzPAVaXquIFuyNRYVaSXX024NG79Z2vDskAWFDhnsJYazAo0C"
+    }
+  ],
+  "modules": {}
+}

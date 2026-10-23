@@ -1,0 +1,109 @@
+<!doctype html>
+<!--
+Anthive episode viewer: replays episode files written by anthive/record.py.
+
+Served by `scripts/view.py --watch <run or folder of runs>`, it lists the runs (newest first) and
+each run's episodes with their results (update, deliveries, survivors, bridges; ★ = most
+deliveries in the run), opens the newest run at its latest episode, and follows new episodes.
+Served without --watch, drop .episode.gz files onto it. Published by scripts/publish.py, it reads
+the site's manifest.json instead (fixtures/ holds a small one to try it with). Links:
+?run=<run>&ep=<episode>&t=<step>&lens=<lens>. It is made of ES modules, so it must be
+served over http: opening this file from disk does not work.
+
+The shell (app.js) owns the episode, the playback clock and the picker; a lens draws the episode
+(lenses/; ?lens=<id>): Lab, the Terrarium, Terrarium HD and Terrarium SimAnt pixel lenses, the
+Terrarium illustrated lens, Field notes and Night colony. The shell's controls are the same in
+every lens: the ☰ menu button top right (lens, run and episode; a bottom sheet on a phone) and the playback dock
+at the bottom, which hides while playing until the pointer moves. Tap the map to play or pause.
+Lab and Field notes need a larger screen and are hidden below 900×500 (unless no lens is left).
+Third-party files are pinned in deps.json: fonts load through fonts.js, modules through the import
+map below (none yet).
+
+Keys: space play/pause · , . step · Home End · [ ] speed · ← → lens · s smoothing ·
+Lab: Tab / Shift-Tab next ant · f follow · 1-6 layers.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anthive viewer</title>
+<style>
+  :root { --bg:#111418; --panel:#1b2027; --line:#2c333d; --text:#d9dee5; --dim:#8a94a3; --acc:#ffd23f;
+          --dock:64px; /* the playback dock's band at the bottom: lenses keep their own content above it */ }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:13px/1.4 -apple-system, system-ui, sans-serif; height:100vh; overflow:hidden; }
+  button, select { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:4px; padding:3px 8px; font:inherit; cursor:pointer; }
+  button.on { border-color:var(--acc); color:var(--acc); }
+  canvas { image-rendering:pixelated; display:block; }
+  h3 { margin:12px 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dim); }
+  .dim { color:var(--dim); }
+  #stage { position:fixed; inset:0; }
+  body[data-lens=lab] #stage { bottom:var(--dock); }  /* Lab's dock is pinned and takes its band */
+  #app { display:grid; grid-template-columns:230px 1fr 350px; height:100%; }
+  #right { padding-top:56px; }  /* below the menu button */
+  #left, #right { padding:10px; overflow:auto; }
+  #left { border-right:1px solid var(--line); }
+  #right { border-left:1px solid var(--line); }
+  #mid { display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px; overflow:hidden; min-width:0; }
+  .row { display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:center; }
+  #status { font-variant-numeric:tabular-nums; }
+  #watch { font-size:11px; }
+  table { border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums; }
+  td, th { padding:2px 5px; text-align:left; font-size:12px; }
+  th { color:var(--dim); font-weight:500; }
+  tbody tr { cursor:pointer; } tbody tr:hover { background:#ffffff0d; } tr.sel { background:#ffd23f22; }
+  .obsgrid { display:grid; grid-template-columns:repeat(3, auto); gap:6px; justify-content:start; }
+  .obsgrid figure { margin:0; } .obsgrid figcaption { font-size:10px; color:var(--dim); }
+  .scalars { display:grid; grid-template-columns:auto auto; gap:0 12px; font-size:11px; font-variant-numeric:tabular-nums; }
+  .policy { display:flex; gap:14px; align-items:flex-start; }
+  .bars div { display:flex; align-items:center; gap:4px; font-size:11px; }
+  .bars .lbl { width:52px; } .bars .b { display:inline-block; height:8px; background:var(--acc); }
+  #drop { position:fixed; inset:0; background:#000a; display:none; place-items:center; font-size:22px; z-index:50; }
+  #empty { padding:40px; max-width:560px; }
+  code { background:var(--panel); padding:1px 4px; border-radius:3px; }
+
+  /* The shell's controls: one look in every lens. */
+  .menu-button { position:fixed; top:12px; right:12px; z-index:41; padding:8px 14px; border-radius:999px;
+    background:#0c0e11d9; color:#e8ecf1; border:1px solid #ffffff33; font:13px -apple-system, system-ui, sans-serif; }
+  .menu-panel { position:fixed; z-index:42; top:58px; right:12px; width:340px; display:none; padding:14px;
+    background:#0c0e11f2; border:1px solid #ffffff26; border-radius:14px; box-shadow:0 12px 40px #0008;
+    font:13px -apple-system, system-ui, sans-serif; }
+  .menu-panel.open { display:block; }
+  .menu-panel .row { flex-direction:column; align-items:stretch; flex-wrap:nowrap; gap:8px; }
+  .menu-panel select { width:100%; background:#161a20; color:#e8ecf1; border:1px solid #ffffff26; border-radius:8px; padding:7px 10px; }
+  .menu-panel #watch, .menu-panel label { color:#aab3bf; font-size:11px; }
+  .dock { position:fixed; z-index:40; left:50%; bottom:10px; transform:translateX(-50%); height:calc(var(--dock) - 20px);
+    display:flex; gap:6px; align-items:center; padding:0 12px; background:#0c0e11eb; border:1px solid #ffffff26;
+    border-radius:14px; transition:opacity .3s, transform .3s; font:13px -apple-system, system-ui, sans-serif; }
+  .dock.hidden { opacity:0; transform:translate(-50%, 16px); pointer-events:none; }
+  .dock button { background:#161a20; color:#e8ecf1; border:1px solid #ffffff26; border-radius:8px; min-width:34px; }
+  .dock .dim { color:#aab3bf; white-space:nowrap; }
+  .dock .speed { display:flex; gap:6px; align-items:center; }
+  body:not(.has-episode) .dock { display:none; }
+  #stage canvas.map { cursor:pointer; }  /* tap to play; also makes iOS deliver the click */
+  .notice { position:fixed; z-index:45; top:60px; left:50%; transform:translateX(-50%); padding:8px 14px; border-radius:999px;
+    background:#0c0e11e6; color:#e8ecf1; border:1px solid #ffffff33; font:13px -apple-system, system-ui, sans-serif;
+    opacity:0; transition:opacity .4s; pointer-events:none; white-space:nowrap; }
+  .notice.shown { opacity:1; }
+  .notice.error { background:#4a1717f0; border-color:#ff8a8a66; white-space:normal; max-width:calc(100% - 32px); text-align:center; }
+  @media (max-width: 600px) {
+    .menu-panel { top:auto; left:0; right:0; bottom:0; width:auto; border-radius:18px 18px 0 0; padding:18px 16px 28px; }
+    .menu-panel select { padding:12px; font-size:16px; }
+    .dock { left:0; right:0; bottom:0; transform:none; justify-content:center; border-radius:14px 14px 0 0; height:var(--dock); }
+    .dock.hidden { transform:translateY(16px); }
+    .dock button { min-width:44px; min-height:44px; padding:8px; }
+    .dock .speed { display:none; }  /* each lens starts at its own speed; the rest fits at thumb size */
+  }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<button id="menu" class="menu-button" aria-expanded="false" title="Lens, run and episode"></button>
+<div id="menu-panel" class="menu-panel"></div>
+<div id="dock" class="dock"></div>
+<div id="notice" class="notice" role="status"></div>
+<div id="drop">Drop .episode.gz files</div>
+<script type="importmap">{"imports": {}}</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

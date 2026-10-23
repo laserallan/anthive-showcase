@@ -1,0 +1,95 @@
+{
+ "format": "anthive-manifest/1",
+ "title": "Anthive",
+ "intro": "<p>A colony of ants learns, from rewards alone, to bring food home and build bridges from planks.\nEvery ant runs the same small policy: there is no leader and no hand-written route.</p>\n",
+ "published": "2026-10-23T01:43:17Z",
+ "entries": [
+  {
+   "name": "hex-1c-g1-20261007-125221",
+   "episodes": 1,
+   "latest": null,
+   "updated": 1792719797,
+   "section": "The colony learns",
+   "title": "Finding food",
+   "blurb": "<p>Ten ants fan out from their nest, find food, and learn to bring it home together.</p>\n",
+   "curve": "runs/hex-1c-g1-20261007-125221/curve.913f861902.json",
+   "rows": [
+    {
+     "file": "runs/hex-1c-g1-20261007-125221/episodes/000300.6de50da17b.episode.gz",
+     "name": "000300",
+     "update": 300,
+     "policy": "hex-1c-g1-20261007-125221 update 300",
+     "seed": null,
+     "num_steps": 500,
+     "food_total": 84,
+     "delivered": 84,
+     "survived": 10,
+     "bridges_built": 0,
+     "planks_total": 0,
+     "river_width": 0,
+     "crossing_depth": 0,
+     "num_ants": 10,
+     "caption": "A mature colony on dry ground"
+    }
+   ]
+  },
+  {
+   "name": "hex-2-dp025-sp6-20261007-150023",
+   "episodes": 1,
+   "latest": null,
+   "updated": 1792719797,
+   "section": "The colony learns",
+   "title": "A wide river",
+   "blurb": "<p>Food is beyond a three-cell river. The colony carries planks to the bank, builds a crossing, then makes the return trip with food.</p>\n",
+   "curve": "runs/hex-2-dp025-sp6-20261007-150023/curve.e1a2dbafae.json",
+   "rows": [
+    {
+     "file": "runs/hex-2-dp025-sp6-20261007-150023/episodes/000400.94f1e58213.episode.gz",
+     "name": "000400",
+     "update": 400,
+     "policy": "hex-2-dp025-sp6-20261007-150023 update 400",
+     "seed": null,
+     "num_steps": 500,
+     "food_total": 84,
+     "delivered": 84,
+     "survived": 10,
+     "bridges_built": 3,
+     "planks_total": 9,
+     "river_width": 3,
+     "crossing_depth": 3,
+     "num_ants": 10,
+     "caption": "A complete crossing of a three-cell river"
+    }
+   ]
+  },
+  {
+   "name": "hex-3-dp025-20261007-161241",
+   "episodes": 1,
+   "latest": null,
+   "updated": 1792719797,
+   "section": "The colony learns",
+   "title": "Many ways across",
+   "blurb": "<p>One policy faces dry maps and rivers up to four cells wide, with planks scattered across the land. This colony builds a full crossing and brings every food item home.</p>\n",
+   "curve": "runs/hex-3-dp025-20261007-161241/curve.72bfc92680.json",
+   "rows": [
+    {
+     "file": "runs/hex-3-dp025-20261007-161241/episodes/000940.e8ecc7ea47.episode.gz",
+     "name": "000940",
+     "update": 940,
+     "policy": "hex-3-dp025-20261007-161241 update 940",
+     "seed": null,
+     "num_steps": 500,
+     "food_total": 84,
+     "delivered": 84,
+     "survived": 10,
+     "bridges_built": 7,
+     "planks_total": 8,
+     "river_width": 4,
+     "crossing_depth": 4,
+     "num_ants": 10,
+     "caption": "A four-cell river, seven bridges, and all food delivered"
+    }
+   ]
+  }
+ ]
+}
